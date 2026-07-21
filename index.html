@@ -288,7 +288,7 @@
     </div>
 
     <script>
-        const CONTRASENA = 'Lquispe2026';
+        const CONTRASENA = 'Lquispe.2026'; // Contraseña de acceso (cambiar aquí para actualizar)
 
         const UBICACIONES_POR_PISO = {
             'BLOQUE A': ['AMBIENTE GENERICO','AMBIENTE 1','AMBIENTE 2','AMBIENTE 3','AMBIENTE 4','AMBIENTE 5','AMBIENTE 6','AMBIENTE 7','AMBIENTE 8','AMBIENTE 9','AMBIENTE 10','AMBIENTE 11'],
@@ -319,12 +319,14 @@
         let html5QrScanner = null, escaneando = false, intervaloExportacion = null;
         let modoOscuro = false;
 
-        // ===================== AUTENTICACIÓN =====================
+        // ===================== AUTENTICACIÓN CON CADUCIDAD DE 24 HORAS =====================
         function verificarPassword() {
             const input = document.getElementById('loginPassword');
             const error = document.getElementById('loginError');
             if (input.value === CONTRASENA) {
+                const ahora = Date.now();
                 localStorage.setItem('app_password', CONTRASENA);
+                localStorage.setItem('app_password_time', ahora.toString());
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('appContainer').style.display = 'block';
                 if (!activosDB.length) init();
@@ -337,15 +339,25 @@
 
         function checkAuth() {
             const savedPassword = localStorage.getItem('app_password');
-            if (savedPassword === CONTRASENA) {
-                document.getElementById('loginOverlay').style.display = 'none';
-                document.getElementById('appContainer').style.display = 'block';
-                return true;
-            } else {
-                document.getElementById('loginOverlay').style.display = 'flex';
-                document.getElementById('appContainer').style.display = 'none';
-                return false;
+            const savedTime = localStorage.getItem('app_password_time');
+            const ahora = Date.now();
+            const veinticuatroHoras = 24 * 60 * 60 * 1000; // milisegundos
+
+            if (savedPassword === CONTRASENA && savedTime) {
+                const tiempoTranscurrido = ahora - parseInt(savedTime, 10);
+                if (tiempoTranscurrido < veinticuatroHoras) {
+                    document.getElementById('loginOverlay').style.display = 'none';
+                    document.getElementById('appContainer').style.display = 'block';
+                    return true;
+                } else {
+                    // Caducó la sesión, limpiar solo el tiempo pero no la contraseña guardada (se volverá a pedir)
+                    localStorage.removeItem('app_password_time');
+                }
             }
+            // Si la contraseña guardada no coincide con la actual (por cambio de código) o no hay sesión válida
+            document.getElementById('loginOverlay').style.display = 'flex';
+            document.getElementById('appContainer').style.display = 'none';
+            return false;
         }
 
         // ===================== INICIALIZACIÓN =====================
@@ -523,7 +535,7 @@
             const input = document.getElementById('searchInput');
             input.value = '';
             setTimeout(() => {
-                input.value = 'E';
+                input.value = 'O';  // <-- Cambiado a letra "O"
                 input.focus();
                 input.setSelectionRange(1, 1);
                 input.scrollIntoView({ behavior: 'smooth', block: 'center' });
