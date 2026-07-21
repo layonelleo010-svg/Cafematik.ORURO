@@ -288,7 +288,7 @@
     </div>
 
     <script>
-        const CONTRASENA = 'Lquispe.2026'; // Contraseña de acceso (cambiar aquí para actualizar)
+        const CONTRASENA = 'Lquispe.2026';
 
         const UBICACIONES_POR_PISO = {
             'BLOQUE A': ['AMBIENTE GENERICO','AMBIENTE 1','AMBIENTE 2','AMBIENTE 3','AMBIENTE 4','AMBIENTE 5','AMBIENTE 6','AMBIENTE 7','AMBIENTE 8','AMBIENTE 9','AMBIENTE 10','AMBIENTE 11'],
@@ -341,7 +341,7 @@
             const savedPassword = localStorage.getItem('app_password');
             const savedTime = localStorage.getItem('app_password_time');
             const ahora = Date.now();
-            const veinticuatroHoras = 24 * 60 * 60 * 1000; // milisegundos
+            const veinticuatroHoras = 24 * 60 * 60 * 1000;
 
             if (savedPassword === CONTRASENA && savedTime) {
                 const tiempoTranscurrido = ahora - parseInt(savedTime, 10);
@@ -350,11 +350,9 @@
                     document.getElementById('appContainer').style.display = 'block';
                     return true;
                 } else {
-                    // Caducó la sesión, limpiar solo el tiempo pero no la contraseña guardada (se volverá a pedir)
                     localStorage.removeItem('app_password_time');
                 }
             }
-            // Si la contraseña guardada no coincide con la actual (por cambio de código) o no hay sesión válida
             document.getElementById('loginOverlay').style.display = 'flex';
             document.getElementById('appContainer').style.display = 'none';
             return false;
@@ -533,13 +531,16 @@
         }
         function prepararBusqueda() {
             const input = document.getElementById('searchInput');
+            // Limpiar completamente cualquier búsqueda anterior
             input.value = '';
-            setTimeout(() => {
-                input.value = 'O';  // <-- Cambiado a letra "O"
-                input.focus();
-                input.setSelectionRange(1, 1);
-                input.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 50);
+            // Escribir la letra O directamente
+            input.value = 'O';
+            // Enfocar y posicionar el cursor después de la O
+            input.focus();
+            input.setSelectionRange(1, 1);
+            // Hacer scroll hasta el input
+            input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // Cerrar detalle de activo si está abierto
             document.getElementById('assetDetail').classList.remove('active');
             activoActual = null; resultadosBusqueda = []; indiceNavegacion = -1;
             document.getElementById('clearSearchBtn').style.display = 'none';
